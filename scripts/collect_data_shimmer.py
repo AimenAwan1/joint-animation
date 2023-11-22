@@ -28,7 +28,7 @@ class CollectDataShimmer(object):
         self._gsrsignal = [0.0] * 3
 
         print "GSR Setting up GSR+"
-        self.ser = serial.Serial("/dev/rfcomm0", 115200)
+        self.ser = serial.Serial("/dev/rfcomm1", 115200)
         self.ser.flushInput()
         print "GSR port opening, done."
         self.ser.write(struct.pack('BBBB', 0x08 , 0x04, 0x01, 0x00))  #GSR and PPG

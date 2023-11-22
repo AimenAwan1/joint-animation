@@ -23,7 +23,7 @@ import numpy as np
 import time
 
 mqtt_enable = False
-shimmer_enable = True
+shimmer_enable = False
 
 if mqtt_enable:
 	from mqtt_publisher import MqttPublisher
@@ -91,7 +91,7 @@ class Joint:
                 point.velocities = []
                 point.accelerations = []
                 point.time_from_start = rospy.Duration(mytime)
-                mytime = mytime + 0.01
+                mytime = mytime + 0.0375 #controls time between datapoints
                 goal.trajectory.points.append(point) 
             print("move_joint for joints \"{}\" with angles size {} {}, duration {}s".format(
             	goal.trajectory.joint_names,
@@ -163,21 +163,21 @@ def main():
     ll_controller.move_joint(start_time,left_leg_angles,[]*len(left_leg_angles),[]*len(left_leg_angles))
     print("Trajectory uploaded")
 	
-	if mqtt_enable:
-		mqtt_pub = MqttPublisher() #Initialization of the mqtt publisher for the recording of the cameras
-		mqtt_pub.publish(1) #Publish signal to start recording with both cameras simultaneously 	
+    if mqtt_enable:
+	mqtt_pub = MqttPublisher() #Initialization of the mqtt publisher for the recording of the cameras
+	mqtt_pub.publish(1) #Publish signal to start recording with both cameras simultaneously 	
 
     if shimmer_enable:
-		shimmer_data_collecter = CollectDataShimmer()
-    	shimmer_data_collecter._dump_data()
-	
-	raw_input("Press enter to stop recording cameras and Shimmer sensor data")
+        shimmer_data_collecter = CollectDataShimmer()
+        shimmer_data_collecter._dump_data()
+
+    raw_input("Press enter to stop recording cameras and Shimmer sensor data")
     if shimmer_enable:
 		shimmer_data_collecter.clean_shutdown()
 		print "Shimmer data collecter shutdown complete"
 		shimmer_data_collecter.clean_shutdown()
-	if mqtt_enable:
-			self.mqtt_pub.publish(0) #Publish signal to stop the recording of the cameras
+    if mqtt_enable:
+        self.mqtt_pub.publish(0) #Publish signal to stop the recording of the cameras
 
     #raw_input("cancel") 
     #os.system("rostopic pub /torso_controller/command trajectory_msgs/JointTrajectory '{joint_names:[], points:[]}'")
