@@ -26,15 +26,16 @@ for i, column in enumerate(data.columns[:32]):
     cs = CubicSpline(x, y)
     interpolated_data[f'interpolated_{i+1}'] = cs(x)
 
-# Save the interpolated values to a new CSV file
+# Save the interpolated values without column titles and 'x' column to a new CSV file
 interpolated_data.to_csv('interpolated_data.csv', header=False, index=False)
 
-# Create a new file interleaving rows from 'talos_pickplace_jointpos.csv' and 'interpolated_data.csv'
+# Create a new file interleaving rows from 'data.csv' and 'interpolated_data.csv'
 merged_file_path = 'merged_data.csv'
 with open(expanded_file_path, 'r') as original_file, open('interpolated_data.csv', 'r') as interpolated_file, open(merged_file_path, 'w') as merged_file:
     for line_original, line_interpolated in zip(original_file, interpolated_file):
-        merged_file.write(line_original.strip() + '\n')
-        merged_file.write(line_interpolated.strip() + '\n')
+        merged_file.write(line_original.strip() + ',' + line_interpolated)
 
-
-
+# Append the remaining rows from 'data.csv' to 'merged_data.csv'
+with open(expanded_file_path, 'r') as original_file, open(merged_file_path, 'a') as merged_file:
+    for line_original in original_file:
+        merged_file.write(line_original.strip() + ',' + ','.join(['NaN']*32) + '\n')
